@@ -5,15 +5,12 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class TaskItemAdapter : RecyclerView.Adapter<TaskItemAdapter.TaskItemViewHolder>() {
+class TaskItemAdapter : ListAdapter<Task, TaskItemAdapter.TaskItemViewHolder>(TaskDiffItemCallback()) {
 
-var data = listOf<Task>()
-    set(value) {
-        field = value
-        notifyDataSetChanged()
-    }
+
     class TaskItemViewHolder(val rootView: CardView)
         : RecyclerView.ViewHolder(rootView) {
         val taskName = rootView.findViewById<TextView>(R.id.task_name)
@@ -37,12 +34,10 @@ var data = listOf<Task>()
         return TaskItemViewHolder.inflateFrom(parent)
     }
 
-    override fun getItemCount(): Int {
-        return data.size
-    }
+
 
     override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
-        val item = data[position]
+        val item =getItem(position)
         holder.bind(item)
     }
 }
