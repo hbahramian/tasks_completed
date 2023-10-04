@@ -1,6 +1,7 @@
 package edu.iu.habahram.tasks
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,8 @@ import edu.iu.habahram.tasks.databinding.FragmentTasksBinding
  * Use the [TasksFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class TasksFragment : Fragment() {
+class TasksFragment : Fragment()   {
+    val TAG = "TasksFragment"
     private var _binding: FragmentTasksBinding? = null
     private val binding get() = _binding!!
     override fun onCreateView(
@@ -32,9 +34,24 @@ class TasksFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val adapter = TaskItemAdapter{ taskId ->
+       /* val adapter = TaskItemAdapter{ taskId ->
+            viewModel.onTaskClicked(taskId)
+
+        }*/
+
+        fun taskClicked (taskId : Long) {
             viewModel.onTaskClicked(taskId)
         }
+        fun yesPressed(taskId : Long) {
+            Log.d(TAG, "in yesPressed(): taskId = $taskId")
+        }
+        fun deleteClicked (taskId : Long) {
+             ConfirmDeleteDialogFragment(taskId,::yesPressed).show(childFragmentManager,
+                 ConfirmDeleteDialogFragment.TAG)
+        }
+        val adapter = TaskItemAdapter(::taskClicked,::deleteClicked)
+
+
         binding.tasksList.adapter = adapter
 
         viewModel.tasks.observe(viewLifecycleOwner, Observer {
@@ -58,4 +75,6 @@ class TasksFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }
