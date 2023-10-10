@@ -19,6 +19,13 @@ class TasksViewModel(val dao: TaskDao) : ViewModel() {
             dao.insert(task)
         }
     }
+    fun deleteTask(taskId: Long) {
+        viewModelScope.launch {
+            val task = Task()
+            task.taskId = taskId
+            dao.delete(task)
+        }
+    }
     fun onTaskClicked(taskId: Long) {
         _navigateToTask.value = taskId
     }
