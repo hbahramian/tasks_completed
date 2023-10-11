@@ -13,20 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <EditText
-            android:id="@+id/task_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="Enter a task name"
-            android:text="@={viewModel.newTaskName}" />
+
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Save Task"
-            android:onClick="@{() -> viewModel.addTask()}" />
+            android:text="Add Task"
+            android:onClick="@{() -> viewModel.onTaskClicked(-1)}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tasks_list"

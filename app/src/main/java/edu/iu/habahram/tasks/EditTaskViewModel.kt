@@ -7,13 +7,29 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
-    val task = dao.get(taskId)
+    var task = MutableLiveData<Task>()
+    val taskId : Long = taskId
     private val _navigateToList = MutableLiveData<Boolean>(false)
     val navigateToList: LiveData<Boolean>
         get() = _navigateToList
+
+    init {
+            dao.get(taskId).observeForever{ it ->
+               if(it == null) {
+                   task.value = Task()
+               } else {
+                   task.value = it
+               }
+            }
+
+    }
     fun updateTask() {
         viewModelScope.launch {
-            dao.update(task.value!!)
+            if(task.value?.taskId != 0L) {
+                dao.update(task.value!!)
+            } else {
+                dao.insert(task.value!!)
+            }
             _navigateToList.value = true
         }
     }
