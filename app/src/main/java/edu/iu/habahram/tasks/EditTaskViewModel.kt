@@ -13,6 +13,8 @@ class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
     val navigateToList: LiveData<Boolean>
         get() = _navigateToList
 
+
+
     init {
             dao.get(taskId).observeForever{ it ->
                if(it == null) {
@@ -41,5 +43,9 @@ class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
     }
     fun onNavigatedToList() {
         _navigateToList.value = false
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 }
