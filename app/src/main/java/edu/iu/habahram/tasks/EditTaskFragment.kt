@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import edu.iu.habahram.tasks.databinding.FragmentEditTaskBinding
 
@@ -26,12 +26,7 @@ class EditTaskFragment : Fragment() {
         val view = binding.root
         val taskId = EditTaskFragmentArgs.fromBundle(requireArguments()).taskId
 
-        val application = requireNotNull(this.activity).application
-        val dao = TaskDatabase.getInstance(application).taskDao
-
-        val viewModelFactory = EditTaskViewModelFactory(taskId, dao)
-        val viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(EditTaskViewModel::class.java)
+        val viewModel : TasksViewModel by activityViewModels()
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.navigateToList.observe(viewLifecycleOwner, Observer { navigate ->

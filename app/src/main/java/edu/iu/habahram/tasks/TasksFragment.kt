@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import edu.iu.habahram.tasks.databinding.FragmentTasksBinding
 
@@ -26,11 +26,7 @@ class TasksFragment : Fragment()   {
     ): View? {
         _binding = FragmentTasksBinding.inflate(inflater, container, false)
         val view = binding.root
-        val application = requireNotNull(this.activity).application
-        val dao = TaskDatabase.getInstance(application).taskDao
-        val viewModelFactory = TasksViewModelFactory(dao)
-        val viewModel = ViewModelProvider(
-            this, viewModelFactory).get(TasksViewModel::class.java)
+        val viewModel : TasksViewModel by activityViewModels()
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 

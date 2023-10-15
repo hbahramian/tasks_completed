@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
+    companion object {
+        var TAG = "EditTaskViewModel"
+    }
     var task = MutableLiveData<Task>()
     val taskId : Long = taskId
     private val _navigateToList = MutableLiveData<Boolean>(false)
@@ -14,13 +17,18 @@ class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
         get() = _navigateToList
 
     init {
-            dao.get(taskId).observeForever{ it ->
-               if(it == null) {
-                   task.value = Task()
-               } else {
-                   task.value = it
-               }
-            }
+        if(taskId == -1L) {
+            task.value = Task()
+        }
+//            dao.get(taskId).observeForever{ it ->
+//                Log.i(TAG, "taskId: $taskId")
+//                Log.i(TAG, it.toString())
+//               if(it == null) {
+//                   task.value = Task()
+//               } else {
+//                   task.value = it
+//               }
+//            }
 
     }
     fun updateTask() {
