@@ -136,6 +136,8 @@ class TasksViewModel : ViewModel() {
 
     fun onNewTaskClicked() {
         _navigateToTask.value = ""
+        taskId = ""
+        task.value = Task()
     }
     fun onTaskNavigated() {
         _navigateToTask.value = null
