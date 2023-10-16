@@ -35,15 +35,15 @@ class TasksFragment : Fragment()   {
 
         }*/
 
-        fun taskClicked (taskId : Long) {
-            viewModel.onTaskClicked(taskId)
+        fun taskClicked (task : Task) {
+            viewModel.onTaskClicked(task)
         }
-        fun yesPressed(taskId : Long) {
+        fun yesPressed(taskId : String) {
             Log.d(TAG, "in yesPressed(): taskId = $taskId")
             //TODO: delete the task with id = taskId
             binding.viewModel?.deleteTask(taskId)
         }
-        fun deleteClicked (taskId : Long) {
+        fun deleteClicked (taskId : String) {
              ConfirmDeleteDialogFragment(taskId,::yesPressed).show(childFragmentManager,
                  ConfirmDeleteDialogFragment.TAG)
         }

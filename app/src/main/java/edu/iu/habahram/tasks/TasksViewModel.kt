@@ -16,13 +16,13 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 class TasksViewModel : ViewModel() {
-    val taskId : Long = -1L
+    var taskId : String = ""
     var task = MutableLiveData<Task>()
     private val _tasks : MutableLiveData<MutableList<Task>> = MutableLiveData()
     val  tasks : LiveData<List<Task>>
         get() = _tasks as LiveData<List<Task>>
-    private val _navigateToTask = MutableLiveData<Long?>()
-    val navigateToTask: LiveData<Long?>
+    private val _navigateToTask = MutableLiveData<String?>()
+    val navigateToTask: LiveData<String?>
         get() = _navigateToTask
 
     private val _navigateToList = MutableLiveData<Boolean>(false)
@@ -33,7 +33,7 @@ class TasksViewModel : ViewModel() {
 
 
     init {
-        if(taskId == -1L) {
+        if(taskId.trim() == "") {
             task.value = Task()
         }
         val database = Firebase.database
@@ -94,6 +94,7 @@ class TasksViewModel : ViewModel() {
                 for (taskSnapshot in dataSnapshot.children) {
                     // TODO: handle the post
                     var task = taskSnapshot.getValue<Task>()
+                    task?.taskId = taskSnapshot.key!!
                     tasksList.add(task!!)
                 }
                 _tasks.value = tasksList
@@ -112,18 +113,29 @@ class TasksViewModel : ViewModel() {
     }
 
     fun updateTask() {
-
+       if (taskId.trim() == "") {
+           tasksCollection.push().setValue(task.value)
+       } else {
+           tasksCollection.child(taskId).setValue(task.value)
+       }
+        _navigateToList.value = true
     }
 
-    fun deleteTask(taskId: Long) {
+    fun deleteTask(taskId: String) {
         viewModelScope.launch {
             val task = Task()
             task.taskId = taskId
 //            dao.delete(task)
         }
     }
-    fun onTaskClicked(taskId: Long) {
-        _navigateToTask.value = taskId
+    fun onTaskClicked(selectedTask: Task) {
+        _navigateToTask.value = selectedTask.taskId
+        taskId = selectedTask.taskId
+        task.value = selectedTask
+    }
+
+    fun onNewTaskClicked() {
+        _navigateToTask.value = ""
     }
     fun onTaskNavigated() {
         _navigateToTask.value = null

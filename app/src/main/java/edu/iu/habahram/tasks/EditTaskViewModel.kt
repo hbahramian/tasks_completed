@@ -31,16 +31,7 @@ class EditTaskViewModel(taskId: Long, val dao: TaskDao) : ViewModel() {
 //            }
 
     }
-    fun updateTask() {
-        viewModelScope.launch {
-            if(task.value?.taskId != 0L) {
-                dao.update(task.value!!)
-            } else {
-                dao.insert(task.value!!)
-            }
-            _navigateToList.value = true
-        }
-    }
+
     fun deleteTask() {
         viewModelScope.launch {
             dao.delete(task.value!!)

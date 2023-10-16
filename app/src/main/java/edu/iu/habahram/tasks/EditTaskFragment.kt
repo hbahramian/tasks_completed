@@ -27,6 +27,7 @@ class EditTaskFragment : Fragment() {
         val taskId = EditTaskFragmentArgs.fromBundle(requireArguments()).taskId
 
         val viewModel : TasksViewModel by activityViewModels()
+        viewModel.taskId = taskId
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.navigateToList.observe(viewLifecycleOwner, Observer { navigate ->

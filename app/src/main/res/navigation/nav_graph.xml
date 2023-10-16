@@ -20,7 +20,7 @@
         tools:layout="@layout/fragment_edit_task" >
         <argument
             android:name="taskId"
-            app:argType="long" />
+            app:argType="string" />
         <action
             android:id="@+id/action_editTaskFragment_to_tasksFragment"
             app:destination="@id/tasksFragment"

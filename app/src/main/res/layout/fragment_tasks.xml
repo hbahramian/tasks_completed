@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Add Task"
-            android:onClick="@{() -> viewModel.onTaskClicked(-1)}" />
+            android:onClick="@{() -> viewModel.onNewTaskClicked()}" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tasks_list"
