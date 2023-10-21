@@ -1,6 +1,5 @@
 package edu.iu.habahram.tasks
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,7 +38,6 @@ class TasksViewModel : ViewModel() {
         tasksCollection = database.getReference("tasks")
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildAdded:" + dataSnapshot.key!!)
 
                 // A new task has been added, add it to the displayed list
                 val task = dataSnapshot.getValue<Task>()
@@ -48,7 +46,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildChanged: ${dataSnapshot.key}")
 
                 // A comment has changed, use the key to determine if we are displaying this
                 // comment and if so displayed the changed comment.
@@ -59,7 +56,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(TaskDaoFirebase.TAG, "onChildRemoved:" + dataSnapshot.key!!)
 
                 // A task has changed, use the key to determine if we are displaying this
                 // comment and if so remove it.
@@ -69,7 +65,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildMoved:" + dataSnapshot.key!!)
 
                 // A comment has changed position, use the key to determine if we are
                 // displaying this comment and if so move it.
@@ -80,7 +75,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TaskDaoFirebase.TAG, "postComments:onCancelled", databaseError.toException())
 
             }
         }
@@ -100,7 +94,6 @@ class TasksViewModel : ViewModel() {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
-                Log.w(TaskDaoFirebase.TAG, "loadPost:onCancelled", databaseError.toException())
                 // ...
             }
         })
