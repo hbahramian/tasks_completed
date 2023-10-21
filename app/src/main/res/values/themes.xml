@@ -3,8 +3,10 @@
     <style name="Base.Theme.Tasks_completed" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="android:windowSplashScreenBackground"></item>
     </style>
 
     <style name="Theme.Tasks_completed" parent="Base.Theme.Tasks_completed" />
+
+
+
 </resources>

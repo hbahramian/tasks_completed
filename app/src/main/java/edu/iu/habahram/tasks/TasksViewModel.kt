@@ -1,9 +1,11 @@
 package edu.iu.habahram.tasks
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -14,6 +16,10 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 
 class TasksViewModel : ViewModel() {
+    private var auth: FirebaseAuth
+
+    var user: User = User()
+    var verifyPassword = ""
     var taskId : String = ""
     var task = MutableLiveData<Task>()
     private val _tasks : MutableLiveData<MutableList<Task>> = MutableLiveData()
@@ -23,14 +29,27 @@ class TasksViewModel : ViewModel() {
     val navigateToTask: LiveData<String?>
         get() = _navigateToTask
 
+    private val _errorHappened = MutableLiveData<String?>()
+    val errorHappened: LiveData<String?>
+        get() = _errorHappened
+
     private val _navigateToList = MutableLiveData<Boolean>(false)
     val navigateToList: LiveData<Boolean>
         get() = _navigateToList
+
+    private val _navigateToSignUp = MutableLiveData<Boolean>(false)
+    val navigateToSignUp: LiveData<Boolean>
+        get() = _navigateToSignUp
+
+    private val _navigateToSignIn = MutableLiveData<Boolean>(false)
+    val navigateToSignIn: LiveData<Boolean>
+        get() = _navigateToSignIn
 
     private lateinit var tasksCollection: DatabaseReference
 
 
     init {
+        auth = Firebase.auth
         if(taskId.trim() == "") {
             task.value = Task()
         }
@@ -39,7 +58,6 @@ class TasksViewModel : ViewModel() {
         tasksCollection = database.getReference("tasks")
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildAdded:" + dataSnapshot.key!!)
 
                 // A new task has been added, add it to the displayed list
                 val task = dataSnapshot.getValue<Task>()
@@ -48,7 +66,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildChanged: ${dataSnapshot.key}")
 
                 // A comment has changed, use the key to determine if we are displaying this
                 // comment and if so displayed the changed comment.
@@ -59,7 +76,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(TaskDaoFirebase.TAG, "onChildRemoved:" + dataSnapshot.key!!)
 
                 // A task has changed, use the key to determine if we are displaying this
                 // comment and if so remove it.
@@ -69,7 +85,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TaskDaoFirebase.TAG, "onChildMoved:" + dataSnapshot.key!!)
 
                 // A comment has changed position, use the key to determine if we are
                 // displaying this comment and if so move it.
@@ -80,7 +95,6 @@ class TasksViewModel : ViewModel() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TaskDaoFirebase.TAG, "postComments:onCancelled", databaseError.toException())
 
             }
         }
@@ -100,7 +114,6 @@ class TasksViewModel : ViewModel() {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
-                Log.w(TaskDaoFirebase.TAG, "loadPost:onCancelled", databaseError.toException())
                 // ...
             }
         })
@@ -139,5 +152,66 @@ class TasksViewModel : ViewModel() {
 
     fun onNavigatedToList() {
         _navigateToList.value = false
+    }
+
+    fun navigateToSignUp() {
+        _navigateToSignUp.value = true
+    }
+
+    fun onNavigatedToSignUp() {
+        _navigateToSignUp.value = false
+    }
+
+    fun navigateToSignIn() {
+        _navigateToSignIn.value = true
+    }
+
+    fun onNavigatedToSignIn() {
+        _navigateToSignIn.value = false
+    }
+
+    fun signIn() {
+        if(user.email.isEmpty() || user.password.isEmpty()) {
+            _errorHappened.value = "Email and password cannot be empty."
+            return
+        }
+        auth.signInWithEmailAndPassword(user.email, user.password).addOnCompleteListener {
+            if (it.isSuccessful) {
+                _navigateToList.value = true
+            }
+            else {
+                _errorHappened.value = it.exception?.message
+            }
+        }
+    }
+
+    fun signUp() {
+        if(user.email.isEmpty() || user.password.isEmpty()) {
+            _errorHappened.value = "Email and password cannot be empty."
+            return
+        }
+        if(user.password != verifyPassword) {
+            _errorHappened.value = "Password and verify do not match."
+            return
+        }
+        auth.createUserWithEmailAndPassword(user.email, user.password).addOnCompleteListener {
+            if (it.isSuccessful) {
+                _navigateToSignIn.value = true
+            }
+            else {
+                _errorHappened.value = it.exception?.message
+            }
+        }
+    }
+
+    fun signOut() {
+        auth.signOut()
+        _navigateToSignIn.value = true
+    }
+
+
+
+    fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
     }
 }

@@ -5,4 +5,7 @@
     <string name="delete_confirmation">Are you sure you want to delete the task?</string>
     <string name="yes">yes</string>
     <string name="no">no</string>
+    <string name="enter_your_email">Enter Your Email .....</string>
+    <string name="enter_your_pass">Enter Your Password .....</string>
+    <string name="re_enter_your_pass">Re-enter Your Password .....</string>
 </resources>

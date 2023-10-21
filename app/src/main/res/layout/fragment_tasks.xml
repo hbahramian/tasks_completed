@@ -14,13 +14,27 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Add Task"
-            android:onClick="@{() -> viewModel.onNewTaskClicked()}" />
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="Add Task"
+                android:onClick="@{() -> viewModel.onNewTaskClicked()}" />
+            <Button
+                android:id="@+id/signout_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="Sign out"
+                android:onClick="@{() -> viewModel.signOut()}" />
+        </LinearLayout>
+
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tasks_list"

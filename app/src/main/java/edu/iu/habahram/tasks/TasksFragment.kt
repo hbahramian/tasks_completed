@@ -66,6 +66,12 @@ class TasksFragment : Fragment()   {
                 viewModel.onTaskNavigated()
             }
         })
+        viewModel.navigateToSignIn.observe(viewLifecycleOwner, Observer { navigate ->
+            if(navigate) {
+                this.findNavController().navigate(R.id.action_tasksFragment_to_signInFragment)
+                viewModel.onNavigatedToSignIn()
+            }
+        })
 
         return view
     }
