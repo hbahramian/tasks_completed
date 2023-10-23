@@ -1,20 +1,19 @@
 package edu.iu.habahram.tasks
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
 class TasksViewModel : ViewModel() {
+    var TAG = "TasksViewModel"
     private var auth: FirebaseAuth
 
     var user: User = User()
@@ -44,7 +43,7 @@ class TasksViewModel : ViewModel() {
     val navigateToSignIn: LiveData<Boolean>
         get() = _navigateToSignIn
 
-    private lateinit var tasksCollection: DatabaseReference
+    private lateinit var tasksCollection: CollectionReference
 
 
     init {
@@ -53,33 +52,29 @@ class TasksViewModel : ViewModel() {
             task.value = Task()
         }
         _tasks.value = mutableListOf<Task>()
+        initializeTheDatabaseReference()
     }
 
     fun initializeTheDatabaseReference() {
 
-        val database = Firebase.database
-        tasksCollection = database
-            .getReference("tasks")
-            .child(auth.currentUser!!.uid)
+        val database = Firebase.firestore
+        tasksCollection = database.collection("tasks")
+        tasksCollection
+            .addSnapshotListener { dataSnapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    return@addSnapshotListener
+                }
 
-
-        tasksCollection.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
                 var tasksList: ArrayList<Task> = ArrayList()
-                for (taskSnapshot in dataSnapshot.children) {
-                    // TODO: handle the post
-                    var task = taskSnapshot.getValue<Task>()
-                    task?.taskId = taskSnapshot.key!!
+                for (taskSnapshot in dataSnapshot!!) {
+                    var task = taskSnapshot.toObject<Task>()
+                    task?.taskId = taskSnapshot.id
                     tasksList.add(task!!)
                 }
                 _tasks.value = tasksList
-            }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                // ...
             }
-        })
 
     }
 
@@ -89,15 +84,27 @@ class TasksViewModel : ViewModel() {
 
     fun updateTask() {
         if (taskId.trim() == "") {
-            tasksCollection.push().setValue(task.value)
+            task.value?.userId = auth.currentUser!!.uid
+            tasksCollection.add(task.value!!)
+                .addOnSuccessListener { documentReference ->
+                    taskId = documentReference.id
+                    Log.d(TAG, "DocumentSnapshot written with ID: ${documentReference.id}")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding document", e)
+                }
         } else {
-            tasksCollection.child(taskId).setValue(task.value)
+            tasksCollection.document(taskId).set(task.value!!)
         }
         _navigateToList.value = true
     }
 
     fun deleteTask(taskId: String) {
-        tasksCollection.child(taskId).removeValue()
+//        tasksCollection.child(taskId).removeValue()
+        tasksCollection.document(taskId)
+            .delete()
+            .addOnSuccessListener { Log.d(TAG, "Task successfully deleted!") }
+            .addOnFailureListener { e -> Log.w(TAG, "Error deleting task ${task.value?.taskName}", e) }
     }
 
     fun onTaskClicked(selectedTask: Task) {
@@ -143,7 +150,7 @@ class TasksViewModel : ViewModel() {
         }
         auth.signInWithEmailAndPassword(user.email, user.password).addOnCompleteListener {
             if (it.isSuccessful) {
-                initializeTheDatabaseReference()
+
                 _navigateToList.value = true
             } else {
                 _errorHappened.value = it.exception?.message

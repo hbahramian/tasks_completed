@@ -37,10 +37,6 @@ android {
         jvmTarget = "17"
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
 
 
 
@@ -53,6 +49,7 @@ android {
 dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     implementation("com.google.firebase:firebase-auth:22.2.0")
+    implementation("com.google.firebase:firebase-firestore:24.9.0")
     val lifecycle_version = "2.3.1"
     val room_version = "2.4.1"
     implementation("androidx.core:core-ktx:1.9.0")
